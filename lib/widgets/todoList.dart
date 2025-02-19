@@ -34,15 +34,51 @@ class _TodoListBuilderState extends State<TodoListBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: widget.todoList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            onTap: () {
-              onItemClicked(index: index);
-            },
-            title: Text(widget.todoList[index]),
-          );
-        });
+    return (widget.todoList.isEmpty)
+        ? Center(child: Text("No item on the todo list"))
+        : ListView.builder(
+            itemCount: widget.todoList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Dismissible(
+                  key: UniqueKey(),
+                  // secondaryBackground: Container(
+                  //   color: Colors.red[300],
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.end,
+                  //     children: [
+                  //       Padding(
+                  //         padding: const EdgeInsets.all(8.0),
+                  //         child: Icon(Icons.delete),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  direction: DismissDirection
+                      .startToEnd, //by doing this it enables just one direction
+                  background: Container(
+                    color: Colors.green,
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(Icons.check),
+                        ),
+                      ],
+                    ),
+                  ),
+                  onDismissed: (direction) {
+                    // if(direction ==DismissDirection.startToEnd){}
+                    setState(() {
+                      widget.todoList.removeAt(index);
+                    });
+                    widget.updateLocalData();
+                  },
+                  child: ListTile(
+                    onTap: () {
+                      onItemClicked(index: index);
+                    },
+                    title: Text(widget.todoList[index]),
+                  ));
+            });
   }
 }

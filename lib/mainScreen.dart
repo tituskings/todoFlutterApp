@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/addTodo.dart';
 import 'package:todo_app/widgets/todoList.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Mainscreen extends StatefulWidget {
   const Mainscreen({super.key});
@@ -30,7 +31,6 @@ class _MainscreenState extends State<Mainscreen> {
                 ]);
           });
     }
-
     setState(() {
       todoList.insert(0, todoText);
     });
@@ -49,6 +49,12 @@ class _MainscreenState extends State<Mainscreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     todoList = (prefs.getStringList("todoList") ?? []).toList();
     setState(() {});
+  }
+
+  @override
+  void initState() {
+    loadData();
+    super.initState();
   }
 
   void showAddTodoButtonSheet() {
@@ -71,23 +77,44 @@ class _MainscreenState extends State<Mainscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+          shape: CircleBorder(),
+          backgroundColor: Colors.blueGrey[900],
+          onPressed: showAddTodoButtonSheet,
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+          )),
       drawer: Drawer(
-        child: Text("drawer data"),
+        child: Column(
+          children: [
+            Container(
+                height: 200,
+                width: double.infinity,
+                color: Colors.blueGrey[900],
+                child: Center(
+                  child: Text(
+                    "Todo App",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                )),
+            ListTile(
+              onTap: () {
+                launchUrl(Uri.parse("www.google.com"));
+              },
+              leading: Icon(Icons.person),
+              title: Text(
+                "About me",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            )
+          ],
+        ),
       ),
       appBar: AppBar(
         centerTitle: true,
         title: Text("Todo App"),
-        actions: [
-          InkWell(
-            onTap: () {
-              showAddTodoButtonSheet();
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.add),
-            ),
-          )
-        ],
       ),
       body:
           TodoListBuilder(todoList: todoList, updateLocalData: updateLocalData),
